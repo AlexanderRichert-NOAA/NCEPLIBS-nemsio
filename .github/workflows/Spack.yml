@@ -40,6 +40,8 @@ jobs:
   recipe-check:
     runs-on: ubuntu-latest
 
+    steps:
+
     - name: recipe-check
       uses: NOAA-EMC/ci-check-spack-recipe@develop
       with:
