@@ -27,7 +27,7 @@ jobs:
     steps:
 
     - name: "Install MPI"
-      if: ${{ matrix.variants == "+mpi" }}
+      if: ${{ matrix.variants == '+mpi' }}
       run: |
         sudo apt-get install libopenmpi libopenmpi-dev
 
