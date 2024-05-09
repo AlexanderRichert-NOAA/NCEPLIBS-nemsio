@@ -23,8 +23,6 @@ jobs:
 
     - name: checkout
       uses: actions/checkout@v4
-      with:
-        submodules: true
 
       # See https://software.intel.com/content/www/us/en/develop/articles/oneapi-repo-instructions.html
     - name: "Install Intel"
