@@ -29,7 +29,7 @@ jobs:
     - name: "Install MPI"
       if: ${{ matrix.variants == '+mpi' }}
       run: |
-        sudo apt-get install libopenmpi libopenmpi-dev
+        sudo apt-get install openmpi-bin libopenmpi-dev
 
     - name: "Build Spack package"
       uses: NOAA-EMC/ci-test-spack-package@develop
