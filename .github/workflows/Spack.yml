@@ -25,7 +25,12 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    
+
+    - name: "Install MPI"
+      if: ${{ matrix.variants }} == "+mpi"
+      run: |
+        sudo apt-get install openmpi openmpi-dev
+
     - name: "Build Spack package"
       uses: NOAA-EMC/ci-test-spack-package@develop
       with:
@@ -35,6 +40,7 @@ jobs:
         use-repo-cache: true
         spack-compiler: gcc
         repo-cache-key-suffix: ${{ matrix.os }}-${{ matrix.variants }}-1
+        spack-externals: cmake gmake perl openmpi
 
   # This job validates the Spack recipe by making sure each cmake build option is represented
   recipe-check:
