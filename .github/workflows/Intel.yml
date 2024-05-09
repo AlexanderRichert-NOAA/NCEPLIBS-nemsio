@@ -26,20 +26,12 @@ jobs:
       with:
         submodules: true
 
-
       # See https://software.intel.com/content/www/us/en/develop/articles/oneapi-repo-instructions.html
     - name: "Install Intel"
       uses: NOAA-EMC/ci-install-intel-toolkit@develop
       with:
         install-mpi: true
-
-    - name: "Compiler setup"
-      run: |
-        if [ ${{ matrix.compilers }} == "oneapi" ]; then
-          echo -ne "CC=mpiicx\nFC=mpiifx" >> $GITHUB_ENV
-        elif [ ${{ matrix.compilers }} == "intel" ]; then
-          echo -ne "CC=mpiicc\nFC=mpiifort" >> $GITHUB_ENV
-        fi
+        mpi-wrapper-setup: ${{ matrix.compilers }}
 
     - name: "Build dependencies"
       uses: NOAA-EMC/ci-build-nceplibs@develop
@@ -48,6 +40,7 @@ jobs:
         w3emc-version: develop
         w3emc-cmake-args: -DBUILD_WITH_BUFR=OFF
         key-prefix: Intel-
+        key-suffix: -1
 
     - name: Build and test
       run: |
