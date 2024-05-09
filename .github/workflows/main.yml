@@ -10,7 +10,7 @@ jobs:
 
     steps:
 
-    - name: install-mpi
+    - name: "Install MPI"
       run: |
         sudo apt-get install libmpich-dev doxygen gcovr
 
@@ -30,18 +30,18 @@ jobs:
         cmake-args: -DENABLE_DOCS=ON -DENABLE_TESTS=ON -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/nceplibs/NCEPLIBS-bacio;$GITHUB_WORKSPACE/nceplibs/NCEPLIBS-w3emc" -DCMAKE_Fortran_FLAGS="-g -fprofile-abs-path -fprofile-arcs -ftest-coverage -O0"
         repo-cache: false
 
-    - name: test
+    - name: "Run CTest suite"
       run: |
         cd $GITHUB_WORKSPACE/nceplibs/src/NCEPLIBS-nemsio/build
         ctest --output-on-failure
 
-    - name: run-gcovr
+    - name: "Build gcovr test coverage report"
       run: |
         cd $GITHUB_WORKSPACE/nceplibs/src/NCEPLIBS-nemsio/build
         gcovr -r .. -v  --html-details -o test-coverage.html
 
-    - name: upload-test-coverage
-      uses: actions/upload-artifact@v2
+    - name: "Upload test coverage report"
+      uses: actions/upload-artifact@v4
       with:
         name: nemsio-test-coverage
         path: nceplibs/src/NCEPLIBS-nemsio/build/*.html
