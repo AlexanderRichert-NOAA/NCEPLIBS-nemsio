@@ -21,7 +21,12 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v4
+    - name: checkout
+      uses: actions/checkout@v4
+      with:
+        path: nemsio
+        submodules: true
+
 
       # See https://software.intel.com/content/www/us/en/develop/articles/oneapi-repo-instructions.html
     - name: "Install Intel"
@@ -46,6 +51,6 @@ jobs:
 
     - name: Build and test
       run: |
-        cmake -B build -DCMAKE_PREFIX_PATH='~/bacio;~/w3emc' ..
-        cmake --build build --parallel 2 VERBOSE=1
-        cmake --build build --target=test --verbose --output-on-failure --rerun-failed
+        cmake -B nemsio/build -DCMAKE_PREFIX_PATH='~/bacio;~/w3emc' ..
+        cmake --build nemsio/build --parallel 2 VERBOSE=1
+        cmake --build nemsio/build --target=test --verbose --output-on-failure --rerun-failed
