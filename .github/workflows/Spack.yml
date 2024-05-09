@@ -33,7 +33,7 @@ jobs:
         package-name: nemsio
         package-variants: ${{ matrix.variants }} ^bufr~python
         custom-recipe: spack/package.py
-        use-build-cache: false
+        use-repo-cache: true
         spack-compiler: gcc
 
     - name: Upload test results
