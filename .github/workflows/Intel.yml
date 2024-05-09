@@ -36,9 +36,9 @@ jobs:
     - name: "Compiler setup"
       run: |
         if [ ${{ matrix.compilers }} == "oneapi" ]; then
-          echo "export CC=mpiicx FC=mpiifx" >> ~/.bash_profile
+          echo -ne "CC=mpiicx\nFC=mpiifx" >> $GITHUB_ENV
         elif [ ${{ matrix.compilers }} == "intel" ]; then
-          echo "export CC=mpiicc FC=mpiifort" >> ~/.bash_profile
+          echo -ne "CC=mpiicc\nFC=mpiifort" >> $GITHUB_ENV
         fi
 
     - name: "Build dependencies"
@@ -47,7 +47,7 @@ jobs:
         bacio-version: develop
         w3emc-version: develop
         w3emc-cmake-args: -DBUILD_WITH_BUFR=OFF
-        key-add: -Intel
+        key-prefix: Intel-
 
     - name: Build and test
       run: |
