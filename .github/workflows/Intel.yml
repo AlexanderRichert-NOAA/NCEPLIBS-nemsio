@@ -47,9 +47,10 @@ jobs:
         bacio-version: develop
         w3emc-version: develop
         w3emc-cmake-args: -DBUILD_WITH_BUFR=OFF
+        key-add: -Intel
 
     - name: Build and test
       run: |
         cmake -B build -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/nceplibs/NCEPLIBS-bacio;$GITHUB_WORKSPACE/nceplibs/NCEPLIBS-w3emc"
         cmake --build build --parallel 2 --verbose
-        cmake --build build --target=test --verbose --output-on-failure --rerun-failed
+        ctest --test-dir build --verbose --output-on-failure --rerun-failed
