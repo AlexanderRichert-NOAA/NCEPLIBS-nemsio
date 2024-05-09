@@ -27,7 +27,7 @@ jobs:
         package-name: NCEPLIBS-nemsio
         package-org: NOAA-EMC
         git-ref: ${{ github.sha }}
-        cmake-args: cmake .. -DENABLE_DOCS=ON -DENABLE_TESTS=ON -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/nceplibs/NCEPLIBS-bacio;$GITHUB_WORKSPACE/nceplibs/NCEPLIBS-w3emc" -DCMAKE_Fortran_FLAGS="-g -fprofile-abs-path -fprofile-arcs -ftest-coverage -O0"
+        cmake-args: -DENABLE_DOCS=ON -DENABLE_TESTS=ON -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/nceplibs/NCEPLIBS-bacio;$GITHUB_WORKSPACE/nceplibs/NCEPLIBS-w3emc" -DCMAKE_Fortran_FLAGS="-g -fprofile-abs-path -fprofile-arcs -ftest-coverage -O0"
         repo-cache: false
 
     - name: test
