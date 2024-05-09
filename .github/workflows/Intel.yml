@@ -12,12 +12,6 @@ on:
     branches:
     - develop
 
-# Use custom shell with -l so .bash_profile is sourced which loads intel/oneapi/setvars.sh
-# without having to do it in manually every step
-defaults:
-  run:
-    shell: bash -leo pipefail {0}
-
 jobs:
   Intel:
     runs-on: ubuntu-latest
@@ -27,60 +21,31 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
       # See https://software.intel.com/content/www/us/en/develop/articles/oneapi-repo-instructions.html
-    - name: install-intel
+    - name: "Install Intel"
+      uses: NOAA-EMC/ci-install-intel-toolkit@develop
+      with:
+        install-mpi: true
+
+    - name: "Compiler setup"
       run: |
-        cd /tmp
-        wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-        sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-        rm GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-        echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-        sudo apt-get update
-        sudo apt-get install intel-oneapi-dev-utilities intel-oneapi-openmp intel-oneapi-mpi intel-oneapi-mpi-devel intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic intel-oneapi-compiler-fortran
-        echo "source /opt/intel/oneapi/setvars.sh" >> ~/.bash_profile
         if [ ${{ matrix.compilers }} == "oneapi" ]; then
           echo "export CC=mpiicx FC=mpiifx" >> ~/.bash_profile
         elif [ ${{ matrix.compilers }} == "intel" ]; then
           echo "export CC=mpiicc FC=mpiifort" >> ~/.bash_profile
         fi
 
-    - name: checkout-bacio
-      uses: actions/checkout@v2
+    - name: "Build dependencies"
+      uses: NOAA-EMC/ci-build-nceplibs@develop
       with:
-        repository: NOAA-EMC/NCEPLIBS-bacio
-        path: bacio
-        ref: develop
+        bacio-version: develop
+        w3emc-version: develop
+        w3emc-cmake-args: -DBUILD_WITH_BUFR=OFF
 
-    - name: build-bacio
+    - name: Build and test
       run: |
-        cd bacio
-        mkdir build
-        cd build
-        cmake .. -DCMAKE_INSTALL_PREFIX=~/bacio
-        make -j2
-        make install
-
-    - name: checkout-w3emc
-      uses: actions/checkout@v2
-      with:
-        repository: NOAA-EMC/NCEPLIBS-w3emc
-        path: w3emc
-        ref: develop
-
-    - name: build-w3emc
-      run: |
-        cd w3emc
-        mkdir build
-        cd build
-        cmake .. -DCMAKE_INSTALL_PREFIX=~/w3emc -DCMAKE_PREFIX_PATH="~/" -DBUILD_WITH_BUFR=OFF
-        make -j2
-        make install
-
-    - name: build and test
-      run: |
-        mkdir build && cd build
-        cmake -DCMAKE_PREFIX_PATH='~/bacio;~/w3emc' ..
-        make -j2 VERBOSE=1
-        ctest --verbose --output-on-failure --rerun-failed
+        cmake -B build -DCMAKE_PREFIX_PATH='~/bacio;~/w3emc' ..
+        cmake --build build --parallel 2 VERBOSE=1
+        cmake --build build --target=test --verbose --output-on-failure --rerun-failed
