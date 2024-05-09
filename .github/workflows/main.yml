@@ -32,16 +32,16 @@ jobs:
 
     - name: test
       run: |
-        cd $GITHUB_WORKSPACE/nceplibs/NCEPLIBS-nemsio/build
+        cd $GITHUB_WORKSPACE/nceplibs/src/NCEPLIBS-nemsio/build
         ctest --output-on-failure
 
     - name: run-gcovr
       run: |
-        cd $GITHUB_WORKSPACE/nceplibs/NCEPLIBS-nemsio/build
+        cd $GITHUB_WORKSPACE/nceplibs/src/NCEPLIBS-nemsio/build
         gcovr -r .. -v  --html-details -o test-coverage.html
 
     - name: upload-test-coverage
       uses: actions/upload-artifact@v2
       with:
         name: nemsio-test-coverage
-        path: nceplibs/NCEPLIBS-nemsio/build/*.html
+        path: nceplibs/src/NCEPLIBS-nemsio/build/*.html
