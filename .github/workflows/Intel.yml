@@ -24,7 +24,6 @@ jobs:
     - name: checkout
       uses: actions/checkout@v4
       with:
-        path: nemsio
         submodules: true
 
 
@@ -51,6 +50,6 @@ jobs:
 
     - name: Build and test
       run: |
-        cmake -B ${{ github.workspace }}/nemsio/build -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/nceplibs/NCEPLIBS-bacio;$GITHUB_WORKSPACE/nceplibs/NCEPLIBS-w3emc" ..
-        cmake --build ${{ github.workspace }}/nemsio/build --parallel 2 VERBOSE=1
-        cmake --build ${{ github.workspace }}/nemsio/build --target=test --verbose --output-on-failure --rerun-failed
+        cmake -B build -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/nceplibs/NCEPLIBS-bacio;$GITHUB_WORKSPACE/nceplibs/NCEPLIBS-w3emc"
+        cmake --build build --parallel 2 VERBOSE=1
+        cmake --build build --target=test --verbose --output-on-failure --rerun-failed
