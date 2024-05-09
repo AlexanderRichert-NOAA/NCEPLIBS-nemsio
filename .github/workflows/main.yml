@@ -21,32 +21,27 @@ jobs:
         w3emc-version: develop
         w3emc-cmake-args: -DBUILD_WITH_BUFR=OFF
 
-    - name: checkout
-      uses: actions/checkout@v2
+    - name: "Build nemsio"
+      uses: NOAA-EMC/ci-build-cmake-code@develop
       with:
-        path: nemsio
-        submodules: true
-
-    - name: build
-      run: |
-        cd nemsio
-        mkdir build
-        cd build
-        cmake .. -DENABLE_DOCS=ON -DENABLE_TESTS=ON -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/nceplibs/NCEPLIBS-bacio;$GITHUB_WORKSPACE/nceplibs/NCEPLIBS-w3emc" -DCMAKE_Fortran_FLAGS="-g -fprofile-abs-path -fprofile-arcs -ftest-coverage -O0"
-        make -j2
+        package-name: NCEPLIBS-nemsio
+        package-org: NOAA-EMC
+        git-ref: ${{ github.sha }}
+        cmake-args: cmake .. -DENABLE_DOCS=ON -DENABLE_TESTS=ON -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/nceplibs/NCEPLIBS-bacio;$GITHUB_WORKSPACE/nceplibs/NCEPLIBS-w3emc" -DCMAKE_Fortran_FLAGS="-g -fprofile-abs-path -fprofile-arcs -ftest-coverage -O0"
+        repo-cache: false
 
     - name: test
       run: |
-        cd $GITHUB_WORKSPACE/nemsio/build
+        cd $GITHUB_WORKSPACE/nceplibs/NCEPLIBS-nemsio/build
         ctest --output-on-failure
 
     - name: run-gcovr
       run: |
-        cd $GITHUB_WORKSPACE/nemsio/build
+        cd $GITHUB_WORKSPACE/nceplibs/NCEPLIBS-nemsio/build
         gcovr -r .. -v  --html-details -o test-coverage.html
 
     - name: upload-test-coverage
       uses: actions/upload-artifact@v2
       with:
         name: nemsio-test-coverage
-        path: nemsio/build/*.html
+        path: nceplibs/NCEPLIBS-nemsio/build/*.html
