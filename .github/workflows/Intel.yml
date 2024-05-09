@@ -51,5 +51,5 @@ jobs:
     - name: Build and test
       run: |
         cmake -B build -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/nceplibs/NCEPLIBS-bacio;$GITHUB_WORKSPACE/nceplibs/NCEPLIBS-w3emc"
-        cmake --build build --parallel 2 VERBOSE=1
+        cmake --build build --parallel 2 --verbose
         cmake --build build --target=test --verbose --output-on-failure --rerun-failed
