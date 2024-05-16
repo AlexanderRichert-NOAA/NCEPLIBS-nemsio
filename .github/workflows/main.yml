@@ -10,67 +10,38 @@ jobs:
 
     steps:
 
-    - name: install-mpi
+    - name: "Install MPI"
       run: |
         sudo apt-get install libmpich-dev doxygen gcovr
 
-    - name: checkout-bacio
-      uses: actions/checkout@v2
+    - name: "Build dependencies"
+      uses: NOAA-EMC/ci-build-nceplibs@develop
       with:
-        repository: NOAA-EMC/NCEPLIBS-bacio
-        path: bacio
-        ref: develop
+        bacio-version: develop
+        w3emc-version: develop
+        w3emc-cmake-args: -DBUILD_WITH_BUFR=OFF
 
-    - name: build-bacio
-      run: |
-        cd bacio
-        mkdir build
-        cd build
-        cmake .. -DCMAKE_INSTALL_PREFIX=~/bacio
-        make -j2
-        make install
-
-    - name: checkout-w3emc
-      uses: actions/checkout@v2
+    - name: "Build nemsio"
+      uses: NOAA-EMC/ci-build-cmake-code@develop
       with:
-        repository: NOAA-EMC/NCEPLIBS-w3emc
-        path: w3emc
-        ref: develop
+        package-name: NCEPLIBS-nemsio
+        package-org: NOAA-EMC
+        git-ref: ${{ github.sha }}
+        cmake-args: -DENABLE_DOCS=ON -DENABLE_TESTS=ON -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/nceplibs/NCEPLIBS-bacio;$GITHUB_WORKSPACE/nceplibs/NCEPLIBS-w3emc" -DCMAKE_Fortran_FLAGS="-g -fprofile-abs-path -fprofile-arcs -ftest-coverage -O0"
+        repo-cache: false
 
-    - name: build-w3emc
+    - name: "Run CTest suite"
       run: |
-        cd w3emc
-        mkdir build
-        cd build
-        cmake .. -DCMAKE_INSTALL_PREFIX=~/w3emc -DCMAKE_PREFIX_PATH="~/" -DBUILD_WITH_BUFR=OFF
-        make -j2
-        make install
-
-    - name: checkout
-      uses: actions/checkout@v2
-      with:
-        path: nemsio
-        submodules: true
-
-    - name: build
-      run: |
-        cd nemsio
-        mkdir build
-        cd build
-        cmake .. -DENABLE_DOCS=ON -DENABLE_TESTS=ON -DCMAKE_PREFIX_PATH="~/" -DCMAKE_Fortran_FLAGS="-g -fprofile-abs-path -fprofile-arcs -ftest-coverage -O0"
-        make -j2
-
-    - name: test
-      run: |
-        cd $GITHUB_WORKSPACE/nemsio/build
+        cd $GITHUB_WORKSPACE/nceplibs/src/NCEPLIBS-nemsio/build
         ctest --output-on-failure
-    - name: run-gcovr
+
+    - name: "Build gcovr test coverage report"
       run: |
-        cd $GITHUB_WORKSPACE/nemsio/build
+        cd $GITHUB_WORKSPACE/nceplibs/src/NCEPLIBS-nemsio/build
         gcovr -r .. -v  --html-details -o test-coverage.html
 
-    - name: upload-test-coverage
-      uses: actions/upload-artifact@v2
+    - name: "Upload test coverage report"
+      uses: actions/upload-artifact@v4
       with:
         name: nemsio-test-coverage
-        path: nemsio/build/*.html
+        path: nceplibs/src/NCEPLIBS-nemsio/build/*.html
